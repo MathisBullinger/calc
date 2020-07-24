@@ -1,5 +1,5 @@
 <script lang="ts">
-  let offset: number = 0
+  let offset = 0
 
   function dragStart() {
     function onMouseMove(event) {
@@ -30,7 +30,7 @@
     background-color: #888;
     cursor: ew-resize;
     position: relative;
-    opacity: 0.2;
+    opacity: 0.15;
     transition: opacity 0.15s ease;
   }
 

@@ -1,4 +1,6 @@
 <script lang="ts">
+  export let lines = []
+
   let html = ''
 
   const decodeHTML = (text) => {
@@ -11,28 +13,27 @@
     .split(/<\/?(div|br)\/?>/)
     .filter((v, i) => !(i % 2) && v)
     .map((v) => decodeHTML(v.replace(/\<\/?\w+\/?\>/g, '')))
-
-  $: if (lines) {
-    console.log(lines)
-  }
 </script>
 
 <style>
-  div {
+  .input {
     display: block;
     font-family: inherit;
     margin: 0;
     height: 100%;
     width: calc(80% + var(--resize-offset));
     min-width: 30ch;
-    --padding: max(5vmin, 1rem);
     padding-top: var(--padding);
     padding-left: var(--padding);
   }
 
-  div:focus {
+  .input:focus {
     outline: none;
+  }
+
+  .input > :global(div) {
+    margin-top: var(--line-dist);
   }
 </style>
 
-<div contenteditable="true" bind:innerHTML={html} />
+<div contenteditable="true" bind:innerHTML={html} class={'input'} />

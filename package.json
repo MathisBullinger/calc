@@ -23,6 +23,7 @@
     "@tsconfig/svelte": "^1.0.0"
   },
   "dependencies": {
+    "mathjs": "^7.1.0",
     "sirv-cli": "^1.0.0"
   }
 }

@@ -1,11 +1,31 @@
+<script lang="ts">
+  export let lines = []
+</script>
+
 <style>
-  div {
-    display: block;
+  ol {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
     height: 100%;
     flex-grow: 1;
     min-width: 30ch;
-    /* border-left: 1px solid #777; */
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    padding-top: var(--padding);
+    padding-right: var(--padding);
+    list-style: none;
+    overflow-x: hidden;
+  }
+
+  li {
+    margin-bottom: var(--line-dist);
   }
 </style>
 
-<div />
+<ol>
+  {#each lines as line}
+    <li>{line}</li>
+  {/each}
+</ol>
