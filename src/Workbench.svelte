@@ -15,7 +15,7 @@
 
     --resize-offset: 0px;
     --padding: max(5vmin, 1rem);
-    --line-dist: 5rem;
+    --line-dist: 1.5rem;
   }
 
   * {
