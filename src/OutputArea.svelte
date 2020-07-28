@@ -1,16 +1,5 @@
 <script lang="ts">
-  export let lines = []
-
-  import memoize from './utils/memoize'
-  import { evaluate } from 'mathjs'
-
-  const interpret = memoize((input) => {
-    try {
-      return evaluate(input)
-    } catch (e) {
-      return ''
-    }
-  })
+  import { lines, output } from './stores'
 </script>
 
 <style>
@@ -36,7 +25,7 @@
 </style>
 
 <ol>
-  {#each lines as line}
-    <li>{interpret(line.trim())}</li>
+  {#each $output as line}
+    <li>{line}</li>
   {/each}
 </ol>

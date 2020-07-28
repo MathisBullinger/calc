@@ -2,8 +2,6 @@
   import Input from './InputArea.svelte'
   import Output from './OutputArea.svelte'
   import Resizer from './Resizer.svelte'
-
-  let lines = []
 </script>
 
 <style>
@@ -24,7 +22,7 @@
 </style>
 
 <div id="workbench">
-  <Input bind:lines />
+  <Input />
   <Resizer />
-  <Output {lines} />
+  <Output />
 </div>
