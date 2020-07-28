@@ -11,8 +11,6 @@ export const atPos = (
 ): { node: Element | null; offset: number } => {
   if (elem.nodeType === Node.TEXT_NODE) {
     const length = elem.textContent.length
-    if (pos <= length) console.log('found in', elem.textContent, pos)
-    else console.log('not found in', elem.textContent)
     return pos <= length
       ? {
           node: elem,
@@ -26,7 +24,6 @@ export const atPos = (
   // @ts-ignore
   for (const child of textChildren) {
     const { node, offset } = atPos(pos, child)
-    console.log({ node, offset })
     if (node) return { node, offset }
     pos -= offset
   }

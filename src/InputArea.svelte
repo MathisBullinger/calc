@@ -24,6 +24,8 @@
   $: {
     const input = document.querySelector('.input')
 
+    const selection = window.getSelection()
+
     if (input) {
       // @ts-ignore
       for (const node of input.querySelectorAll('[class^=calc]')) {
@@ -41,12 +43,24 @@
           if (!start.node) continue
           const end = atPos(token.index + off + token.value.length, input)
           if (!end.node) continue
+
+          const moveCursor =
+            end.node === selection.anchorNode &&
+            end.offset === selection.anchorOffset
+
           const range = document.createRange()
           range.setStart(start.node, start.offset)
           range.setEnd(end.node, end.offset)
           const node = document.createElement('span')
           node.setAttribute('class', 'calc-op')
           range.surroundContents(node)
+
+          const cursorRange = document.createRange()
+          if (moveCursor) cursorRange.setStartAfter(node)
+          else
+            cursorRange.setStart(selection.anchorNode, selection.anchorOffset)
+          selection.removeAllRanges()
+          selection.addRange(cursorRange)
         }
         off += $lineStore[i].length
       }
@@ -75,7 +89,7 @@
   }
 
   :global(.calc-op) {
-    background-color: red;
+    color: var(--syntax-op);
   }
 </style>
 
