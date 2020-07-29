@@ -21,6 +21,16 @@
     lineStore.update(() => lines)
   }
 
+  function handleKey(e) {
+    if ([187, 189].includes(e.keyCode) && e.metaKey) {
+      e.preventDefault()
+      document.documentElement.style.fontSize = `${
+        parseFloat(getComputedStyle(document.documentElement).fontSize) +
+        1 * (e.keyCode === 187 ? 1 : -1)
+      }px`
+    }
+  }
+
   $: {
     const input = document.querySelector('.input')
 
@@ -95,4 +105,8 @@
   }
 </style>
 
-<div contenteditable="true" class={'input'} on:input={handleInput} />
+<div
+  contenteditable="true"
+  class={'input'}
+  on:input={handleInput}
+  on:keydown={handleKey} />
