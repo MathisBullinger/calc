@@ -32,6 +32,32 @@
     }
   }
 
+  type Pos = { node: Element; offset: number }
+  function highlight(
+    start: Pos,
+    end: Pos,
+    selection: Selection,
+    type: 'num' | 'op' | 'error'
+  ) {
+    const moveCursor =
+      end.node === selection.anchorNode && end.offset === selection.anchorOffset
+
+    const range = document.createRange()
+    if (start.node.parentElement.className.includes('calc-'))
+      range.setStartAfter(start.node.parentElement)
+    else range.setStart(start.node, start.offset)
+    range.setEnd(end.node, end.offset)
+    const node = document.createElement('span')
+    node.setAttribute('class', `calc-${type}`)
+    range.surroundContents(node)
+
+    const cursorRange = document.createRange()
+    if (moveCursor) cursorRange.setStartAfter(node)
+    else cursorRange.setStart(selection.anchorNode, selection.anchorOffset)
+    selection.removeAllRanges()
+    selection.addRange(cursorRange)
+  }
+
   $: {
     const input = document.querySelector('.input')
 
@@ -49,36 +75,23 @@
 
       let off = 0
       for (let i = 0; i < Math.min($meta.length, $lineStore.length); i++) {
-        for (const token of $meta[i]) {
-          // if (!Token.operators.includes(token.type as any)) continue
+        for (const token of $meta[i][0]) {
           if (token.type === 'UNKNOWN') continue
-          const start = atPos(token.index + off, input)
-          if (!start.node) continue
-          const end = atPos(token.index + off + token.lexeme.length, input)
-          if (!end.node) continue
-
-          const moveCursor =
-            end.node === selection.anchorNode &&
-            end.offset === selection.anchorOffset
-
-          const range = document.createRange()
-          if (start.node.parentElement.className.includes('calc-'))
-            range.setStartAfter(start.node.parentElement)
-          else range.setStart(start.node, start.offset)
-          range.setEnd(end.node, end.offset)
-          const node = document.createElement('span')
-          node.setAttribute(
-            'class',
-            `calc-${token.category === 'OPERATOR' ? 'op' : 'num'}`
+          highlight(
+            atPos(token.index + off, input),
+            atPos(token.index + off + token.lexeme.length, input),
+            selection,
+            token.category === 'OPERATOR' ? 'op' : 'num'
           )
-          range.surroundContents(node)
-
-          const cursorRange = document.createRange()
-          if (moveCursor) cursorRange.setStartAfter(node)
-          else
-            cursorRange.setStart(selection.anchorNode, selection.anchorOffset)
-          selection.removeAllRanges()
-          selection.addRange(cursorRange)
+        }
+        for (const error of $meta[i][1]) {
+          console.log(error)
+          highlight(
+            atPos(error.start + off, input),
+            atPos(error.start + off + error.end + 1, input),
+            selection,
+            'error'
+          )
         }
         off += $lineStore[i].length
       }
@@ -110,13 +123,17 @@
     color: var(--syntax-op);
   }
 
+  :global(.calc-op::before),
+  :global(.calc-op::after) {
+    content: '\2009';
+  }
+
   :global(.calc-num) {
     color: var(--syntax-num);
   }
 
-  :global(.calc-op::before),
-  :global(.calc-op::after) {
-    content: '\2009';
+  :global(.calc-error) {
+    text-decoration: underline solid var(--syntax-error);
   }
 </style>
 

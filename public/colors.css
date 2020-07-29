@@ -1,4 +1,5 @@
 :root {
   --syntax-op: #faa;
   --syntax-num: #ffa;
+  --syntax-error: #f65;
 }

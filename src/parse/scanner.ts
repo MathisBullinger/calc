@@ -2,6 +2,7 @@ import Token, { TokenType, Operator } from './token'
 
 export default class Scanner {
   private tokens: Token[] = []
+  public errors: Error[] = []
 
   private start = 0
   private current = 0
@@ -13,6 +14,31 @@ export default class Scanner {
       this.start = this.current
       this.scanToken()
     }
+
+    for (let i = 1; i < this.tokens.length; i++) {
+      if (
+        this.tokens[i - 1].type === 'UNKNOWN' &&
+        this.tokens[i].type === 'UNKNOWN'
+      ) {
+        this.tokens[i - 1] = new Token(
+          'UNKNOWN',
+          this.tokens[i - 1].lexeme + this.tokens[i].lexeme,
+          this.tokens[i - 1].index
+        )
+        this.tokens.splice(i, 1)
+        i--
+      }
+    }
+
+    this.errors.push(
+      ...this.tokens
+        .filter(({ type }) => type === 'UNKNOWN')
+        .map(({ index, lexeme }) => ({
+          start: index,
+          end: index + lexeme.length - 1,
+          reason: `unknown token ${lexeme}`,
+        }))
+    )
 
     return this.tokens
   }
@@ -27,18 +53,14 @@ export default class Scanner {
       if (c === '0' && '0' + this.peek()?.toLowerCase() in Token.basePrefix) {
         base = Token.basePrefix['0' + this.peek().toLowerCase()]
         this.advance()
-        console.log({ base, peek: this.peek() })
         if (
           !{ 2: /[0-1]/, 10: /[0-9]/, 16: /[0-9a-f]/ }[base].test(
             this.peek()?.toLowerCase()
           )
-        ) {
-          console.log('skip')
+        )
           return this.addToken('UNKNOWN')
-        } else console.log('go')
       }
-      this.number(base)
-      return this.addToken('NUMBER')
+      return this.number(base)
     }
     this.addToken('UNKNOWN')
   }
@@ -49,13 +71,15 @@ export default class Scanner {
       10: /[0-9_,.]/,
       16: /[0-9a-fA-F_,.]/,
     }
-    while (valid[base].test(this.advance()));
+    while (valid[base].test(this.peek())) {
+      this.advance()
+    }
+    return this.addToken('NUMBER')
   }
 
   private advance(steps = 1) {
     if (steps <= 0) return this.source[this.current - 1] ?? '\u0003'
     this.current++
-    console.log('advance', steps)
     return this.advance(--steps)
   }
 
@@ -72,4 +96,10 @@ export default class Scanner {
       )
     )
   }
+}
+
+export type Error = {
+  start: number
+  end: number
+  reason?: string
 }
