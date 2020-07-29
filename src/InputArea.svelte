@@ -49,7 +49,9 @@
             end.offset === selection.anchorOffset
 
           const range = document.createRange()
-          range.setStart(start.node, start.offset)
+          if (start.node.parentElement.className.includes('calc-'))
+            range.setStartAfter(start.node.parentElement)
+          else range.setStart(start.node, start.offset)
           range.setEnd(end.node, end.offset)
           const node = document.createElement('span')
           node.setAttribute('class', 'calc-op')
