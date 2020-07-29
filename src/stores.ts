@@ -5,15 +5,15 @@ import type Token from './parse/token'
 import type { Error } from './parse/scanner'
 
 export const lines = writable([])
-export const meta = writable([] as [Token[], Error[]][])
+export const meta = writable([] as [Token[], Error[], number][])
 
 const parse = memoize(_parse)
 
 export const convert = (line: string, index: number): string => {
-  const { result, tokens, errors } = parse(line)
+  const { result, tokens, errors, offset } = parse(line)
   meta.update((v) => [
     ...v.slice(0, index),
-    [tokens, errors],
+    [tokens, errors, offset],
     ...v.slice(index + 1),
   ])
   return result

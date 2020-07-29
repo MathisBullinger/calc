@@ -75,6 +75,7 @@
 
       let off = 0
       for (let i = 0; i < Math.min($meta.length, $lineStore.length); i++) {
+        off += $meta[i][2]
         for (const token of $meta[i][0]) {
           if (token.type === 'UNKNOWN') continue
           highlight(
