@@ -1,15 +1,9 @@
-export type Token = {
-  type: 'NUMBER' | 'OPERATION' | 'UNKNOWN'
-  value: string
-  index: number
-}
+import Scanner from './scanner'
+import type Token from './token'
 
 export default function (expr: string): { result: string; tokens: Token[] } {
-  const tokens: Token[] = []
-
-  for (const match of expr.matchAll(/[+\-*/]/g)) {
-    tokens.push({ type: 'OPERATION', value: match[0], index: match.index })
-  }
+  const tokens = new Scanner(expr).scan()
+  console.log(tokens.join(' '))
 
   return { result: expr, tokens }
 }

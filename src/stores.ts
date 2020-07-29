@@ -1,6 +1,7 @@
 import { writable, derived } from 'svelte/store'
-import _parse, { Token } from './parse'
+import _parse from './parse'
 import memoize from './utils/memoize'
+import type Token from './parse/token'
 
 export const lines = writable([])
 export const meta = writable([] as Token[][])

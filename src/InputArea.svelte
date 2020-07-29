@@ -1,6 +1,7 @@
 <script lang="ts">
   import { lines as lineStore, meta } from './stores'
   import { atPos } from './utils/dom'
+  import Token from './parse/token'
 
   const decodeHTML = (text) => {
     const e = document.createElement('div')
@@ -49,9 +50,11 @@
       let off = 0
       for (let i = 0; i < Math.min($meta.length, $lineStore.length); i++) {
         for (const token of $meta[i]) {
+          // if (!Token.operators.includes(token.type as any)) continue
+          if (token.type === 'UNKNOWN') continue
           const start = atPos(token.index + off, input)
           if (!start.node) continue
-          const end = atPos(token.index + off + token.value.length, input)
+          const end = atPos(token.index + off + token.lexeme.length, input)
           if (!end.node) continue
 
           const moveCursor =
@@ -64,7 +67,10 @@
           else range.setStart(start.node, start.offset)
           range.setEnd(end.node, end.offset)
           const node = document.createElement('span')
-          node.setAttribute('class', 'calc-op')
+          node.setAttribute(
+            'class',
+            `calc-${token.category === 'OPERATOR' ? 'op' : 'num'}`
+          )
           range.surroundContents(node)
 
           const cursorRange = document.createRange()
@@ -102,6 +108,15 @@
 
   :global(.calc-op) {
     color: var(--syntax-op);
+  }
+
+  :global(.calc-num) {
+    color: var(--syntax-num);
+  }
+
+  :global(.calc-op::before),
+  :global(.calc-op::after) {
+    content: '\2009';
   }
 </style>
 
