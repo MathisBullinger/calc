@@ -14,6 +14,7 @@ export default class Token {
   }
 
   static readonly operators = ['+', '-', '*', '/', '^'] as const
+  static readonly grouping = ['(', ')'] as const
 
   static readonly basePrefix = {
     '0b': 2,
@@ -23,4 +24,5 @@ export default class Token {
 
 type Literal = 'NUMBER'
 export type Operator = typeof Token.operators[number]
-export type TokenType = Operator | Literal | 'UNKNOWN'
+export type Grouping = typeof Token.grouping[number]
+export type TokenType = Operator | Grouping | Literal | 'UNKNOWN'

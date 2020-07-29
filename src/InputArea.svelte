@@ -37,7 +37,7 @@
     start: Pos,
     end: Pos,
     selection: Selection,
-    type: 'num' | 'op' | 'error'
+    type: 'num' | 'op' | 'group' | 'error'
   ) {
     const moveCursor =
       end.node === selection.anchorNode && end.offset === selection.anchorOffset
@@ -81,11 +81,14 @@
             atPos(token.index + off, input),
             atPos(token.index + off + token.lexeme.length, input),
             selection,
-            token.category === 'OPERATOR' ? 'op' : 'num'
+            token.category === 'OPERATOR'
+              ? 'op'
+              : token.category === 'NUMBER'
+              ? 'num'
+              : 'group'
           )
         }
         for (const error of $meta[i][1]) {
-          console.log(error)
           highlight(
             atPos(error.start + off, input),
             atPos(error.start + off + error.end + 1, input),
@@ -130,6 +133,10 @@
 
   :global(.calc-num) {
     color: var(--syntax-num);
+  }
+
+  :global(.calc-group) {
+    color: var(--syntax-group);
   }
 
   :global(.calc-error) {
