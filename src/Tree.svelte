@@ -1,16 +1,15 @@
 <script lang="ts">
   import { tree } from './stores'
 
-  let canvas: HTMLCanvasElement
+  let _canvas: HTMLElement
 
-  $: if (canvas && $tree) {
+  $: if (_canvas && $tree) {
+    const canvas: HTMLCanvasElement = _canvas as any
     canvas.width = canvas.clientWidth * devicePixelRatio
     canvas.height = canvas.clientHeight * devicePixelRatio
 
     const ctx = canvas.getContext('2d')
     ctx.fillStyle = '#fff'
-
-    ctx.
   }
 </script>
 
@@ -28,4 +27,4 @@
   }
 </style>
 
-<canvas hidden={!$tree} bind:this={canvas} />
+<canvas hidden={!$tree} bind:this={_canvas} />

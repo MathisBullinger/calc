@@ -1,7 +1,6 @@
 <script lang="ts">
   import { lines as lineStore, meta } from './stores'
   import { atPos } from './utils/dom'
-  import Token from './parse/token'
 
   const decodeHTML = (text) => {
     const e = document.createElement('div')
