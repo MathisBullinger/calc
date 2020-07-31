@@ -3,6 +3,7 @@ import _parse from './parse'
 import memoize from './utils/memoize'
 import type Token from './parse/token'
 import type { Error } from './parse/scanner'
+import type Node from './utils/node'
 
 export const lines = writable([])
 export const meta = writable([] as [Token[], Error[], number][])
@@ -22,3 +23,5 @@ export const convert = (line: string, index: number): string => {
 export const output = derived(lines, ($lines) =>
   $lines.map((line, i) => convert(line, i))
 )
+
+export const tree = writable<Node>(null)

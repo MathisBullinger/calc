@@ -1,6 +1,8 @@
 import Scanner from './scanner'
+import Parser from './parser'
 import type Token from './token'
 import type { Error } from './scanner'
+import { tree } from '../stores'
 
 export default function (
   expr: string
@@ -12,7 +14,11 @@ export default function (
   const tokens = scanner.scan()
   const errors = scanner.errors
 
-  console.log(tokens.join(' '))
+  const parser = new Parser(tokens)
+  const ast = parser.parse()
+
+  if (cmd === '/tree') tree.set(ast)
+  else tree.set(null)
 
   return { result: expr, tokens, errors, offset: cmd?.length ?? 0 }
 }
