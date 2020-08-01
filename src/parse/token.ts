@@ -15,19 +15,27 @@ export default class Token {
     return `${this.category}<${this.lexeme}>`
   }
 
-  static readonly operators = ['+', '-', '*', '/', '^'] as const
+  static readonly operators = ['+', '-', '*', '/', '^', '!'] as const
+  static readonly comparison = ['=', '!=', '<', '<=', '>', '>='] as const
   static readonly grouping = ['(', ')'] as const
 
   static readonly basePrefix = {
     '0b': 2,
     '0x': 16,
   } as const
+
+  static readonly type = [
+    ...Token.operators,
+    ...Token.grouping,
+    ...Token.comparison,
+    'NUMBER',
+    'UNKNOWN',
+  ] as const
 }
 
-type Literal = 'NUMBER'
 export type Operator = typeof Token.operators[number]
-export type Grouping = typeof Token.grouping[number]
-export type TokenType = Operator | Grouping | Literal | 'UNKNOWN'
+export type Comparison = typeof Token.comparison[number]
+export type TokenType = typeof Token.type[number]
 
 export type WithRule = {
   token: Token
