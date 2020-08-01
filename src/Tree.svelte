@@ -14,6 +14,10 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
     ctx.strokeStyle = '#fff'
+    ctx.fillStyle = '#fff'
+    ctx.font = `${devicePixelRatio}rem sans-serif`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
 
     let totalDepth = 0
     let layers = { 1: 1 }
@@ -59,6 +63,8 @@
       ctx.beginPath()
       ctx.ellipse(x, y, nodeSize / 4, nodeSize / 4, 0, 0, 2 * Math.PI)
       ctx.stroke()
+
+      ctx.fillText(node.toString(), x, y)
 
       node.children?.forEach((child) =>
         renderNode(x, layer + 1, child, node.children)
