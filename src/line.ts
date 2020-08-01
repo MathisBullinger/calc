@@ -2,6 +2,7 @@ import memoize from './utils/memoize'
 import Scanner from './parse/scanner'
 import Parser from './parse/parser2'
 import { tree as treeStore } from './stores'
+import type { Expr } from './parse/ast/Expr'
 
 export default class Line {
   private static count = 0
@@ -16,20 +17,24 @@ export default class Line {
   }
   public set input(v: string) {
     this._input = v
+
+    const cmd = v.match(/^\/\w+(?=\s)/)?.[0]
+    if (cmd) v = v.slice(cmd.length)
+
     this._output = v
-    Line.eval(v.trim())
+    const { tree } = Line.eval(v.trim())
+
+    if (cmd === '/tree') treeStore.set(tree)
   }
 
   public get output() {
     return this._output
   }
 
-  static eval = memoize((v: string) => {
+  static eval = memoize((v: string): { tree: Expr } => {
     const tokens = new Scanner(v).scan()
-    console.log(tokens)
     const tree = new Parser(tokens).parse()
-    console.log(tree)
-    if (tree) treeStore.set(tree)
+    return { tree }
   })
 
   public focus = () => {}
