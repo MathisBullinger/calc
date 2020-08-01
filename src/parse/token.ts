@@ -35,6 +35,7 @@ export default class Token {
 
 export type Operator = typeof Token.operators[number]
 export type Comparison = typeof Token.comparison[number]
+export type Grouping = typeof Token.grouping[number]
 export type TokenType = typeof Token.type[number]
 
 export type WithRule = {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { lines, output } from './stores'
+  import { lines } from './stores'
 </script>
 
 <style>
@@ -25,7 +25,7 @@
 </style>
 
 <ol>
-  {#each $output as line}
-    <li>{line}</li>
+  {#each $lines as { output }}
+    <li>{output}</li>
   {/each}
 </ol>
