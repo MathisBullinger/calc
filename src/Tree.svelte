@@ -21,12 +21,24 @@
 
     let totalDepth = 0
     let layers = { 1: 1 }
-    function walkTree(node: Node, depth = 1) {
-      if (!node) return
+    const branchSize = new Map<Node, number>()
+
+    function walkTree(node: Node, depth = 1): number {
+      if (!node) return 1
       if (depth > totalDepth) totalDepth = depth
       if (node.children.length)
         layers[depth + 1] = (layers[depth + 1] ?? 0) + node.children.length
-      node.children.forEach((child) => walkTree(child, depth + 1))
+      return branchSize
+        .set(
+          node,
+          Math.max(
+            node.children
+              .map((child) => walkTree(child, depth + 1))
+              .reduce((a, c) => a + c, 1) - 1,
+            1
+          )
+        )
+        .get(node)
     }
     walkTree($tree)
 
@@ -46,8 +58,15 @@
       if (!node) return
 
       let x = xRoot
-      if (siblings)
-        x += (siblings.indexOf(node) - siblings.length / 2 + 0.5) * nodeSize * 2
+      if (siblings?.length)
+        x -=
+          (siblings.map((v) => branchSize.get(v)).reduce((a, c) => a + c) / 2 -
+            siblings
+              .slice(0, siblings.indexOf(node))
+              .map((v) => branchSize.get(v))
+              .reduce((a, c) => a + c, 0) -
+            branchSize.get(node) / 2) *
+          nodeSize
       const y = nodeSize * (layer + 1) * 2
 
       if (siblings) {
@@ -91,8 +110,6 @@
     height: 40rem;
     max-width: 100vmin;
     max-height: 100vmin;
-
-    border: 1px solid red;
   }
 </style>
 
