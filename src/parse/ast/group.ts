@@ -1,12 +1,12 @@
 import Node from '../../utils/node'
-import type Token from '../token'
+import type { WithRule } from '../token'
 
 export default class Group extends Node {
-  constructor(readonly tokens: Token[]) {
+  constructor(readonly tokens: WithRule[]) {
     super()
   }
 
   toString(): string {
-    return 'group'
+    return this.tokens.map(({ token }) => token.lexeme).join(' ')
   }
 }

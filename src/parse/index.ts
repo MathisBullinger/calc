@@ -15,10 +15,15 @@ export default function (
   const errors = scanner.errors
 
   const parser = new Parser(tokens)
-  const ast = parser.parse()
+  const { ast, result } = parser.parse()
 
   if (cmd === '/tree') tree.set(ast)
   else tree.set(null)
 
-  return { result: expr, tokens, errors, offset: cmd?.length ?? 0 }
+  return {
+    result: result?.toString() ?? '',
+    tokens,
+    errors,
+    offset: cmd?.length ?? 0,
+  }
 }

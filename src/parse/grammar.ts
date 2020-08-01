@@ -14,7 +14,7 @@ interface ParamsArray<T extends any, L extends number> extends Array<T> {
   length: L
 }
 
-abstract class Expression {
+export abstract class Expression {
   abstract readonly precedence: Precedence
 }
 
