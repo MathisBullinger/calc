@@ -45,9 +45,13 @@ export default class Parser {
     if (tokens.length === 1 && tokens[0].token.category === 'NUMBER')
       return new Number(tokens[0].token)
 
-    const lowestOp = tokens
-      .filter((token) => token.token.category === 'OPERATOR')
-      .sort((a, b) => a.rule?.precedence - b.rule?.precedence)[0]
+    const ops = tokens.filter(
+      ({ token, rule }) => token.category === 'OPERATOR' && rule
+    )
+    const lowestPrec = Math.min(...ops.map(({ rule }) => rule.precedence))
+    const lowestOp = ops
+      .filter(({ rule }) => rule.precedence === lowestPrec)
+      .slice(-1)[0]
 
     if (lowestOp) {
       const op = new BinaryOp(lowestOp.token)

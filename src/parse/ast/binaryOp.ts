@@ -9,7 +9,15 @@ export default class BinaryOp extends EvalNode<number> {
   }
 
   eval() {
-    return this.children.map((child) => child.eval()).reduce((a, c) => a + c)
+    const op = {
+      '+': (a, b) => a + b,
+      '-': (a, b) => a - b,
+      '*': (a, b) => a * b,
+      '/': (a, b) => a / b,
+    }
+    return this.children
+      .map((child) => child.eval())
+      .reduce((a, c) => op[this.op.lexeme](a, c))
   }
 
   toString(): string {

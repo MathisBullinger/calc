@@ -22,6 +22,7 @@
     let totalDepth = 0
     let layers = { 1: 1 }
     function walkTree(node: Node, depth = 1) {
+      if (!node) return
       if (depth > totalDepth) totalDepth = depth
       if (node.children.length)
         layers[depth + 1] = (layers[depth + 1] ?? 0) + node.children.length
@@ -42,6 +43,8 @@
       node: Node,
       siblings?: Node[]
     ) {
+      if (!node) return
+
       let x = xRoot
       if (siblings)
         x += (siblings.indexOf(node) - siblings.length / 2 + 0.5) * nodeSize * 2
