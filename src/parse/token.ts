@@ -22,6 +22,7 @@ export default class Token {
     '!',
     'and',
     'or',
+    'not',
   ] as const
   static readonly comparison = ['=', '!=', '<', '<=', '>', '>='] as const
   static readonly grouping = ['(', ')'] as const

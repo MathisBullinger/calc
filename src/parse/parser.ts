@@ -28,15 +28,24 @@ export default class Parser {
   }
 
   private booleanMultiplication(): Expr {
-    let expr = this.comparison()
+    let expr = this.booleanUnary()
 
     while (this.match('and')) {
       const operator = this.previous()
-      const right = this.comparison()
+      const right = this.booleanUnary()
       expr = new Infix(expr, operator, right)
     }
 
     return expr
+  }
+
+  private booleanUnary(): Expr {
+    if (this.match('not')) {
+      const operator = this.previous()
+      const right = this.booleanUnary()
+      return new Unary(operator, right)
+    }
+    return this.comparison()
   }
 
   private comparison(): Expr {

@@ -32,8 +32,15 @@ export default class Evalutator {
         node.operator
       )
     let right = this.eval(node.right)
-    if (node.operator.type === '+') return right
-    else return -right
+
+    switch (node.operator.type) {
+      case '+':
+        return right
+      case '-':
+        return -right
+      case 'not':
+        return !right
+    }
   }
 
   private binary(node: Infix) {

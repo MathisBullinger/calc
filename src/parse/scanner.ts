@@ -47,9 +47,9 @@ export default class Scanner {
     const c = this.advance()
 
     if (/\s/.test(c) || c === '\u0003') return
-    const isOp = this.readsWords('and', 'or')
+    const isOp = this.readsWords('and', 'or', 'not')
     if (isOp) {
-      this.advance(isOp.length)
+      this.advance(isOp.length - 1)
       return this.addToken(isOp as Operator)
     }
     if (Token.operators.includes(c as any)) return this.addToken(c as Operator)
@@ -76,11 +76,11 @@ export default class Scanner {
       return this.number(base)
     }
     if (this.reads(/true(?=[^a-z]|$)/i)) {
-      this.advance(4)
+      this.advance(3)
       return this.addToken('BOOLEAN')
     }
     if (this.reads(/false(?=[^a-z]|$)/i)) {
-      this.advance(5)
+      this.advance(4)
       return this.addToken('BOOLEAN')
     }
     this.addToken('UNKNOWN')
@@ -116,7 +116,9 @@ export default class Scanner {
     const remainder = this.source.slice(this.current - 1)
     return words.find(
       (word) =>
-        remainder.startsWith(word) && /[^a-zA-Z]/.test(remainder[word.length])
+        remainder.startsWith(word) &&
+        (remainder.length === word.length ||
+          /[^a-zA-Z]/.test(remainder[word.length]))
     )
   }
 
