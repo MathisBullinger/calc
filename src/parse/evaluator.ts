@@ -1,5 +1,5 @@
 import type { Expr } from './expr'
-import { Literal, Unary, Infix } from './expr'
+import { Literal, Unary, Infix, Grouping } from './expr'
 import type Token from './token'
 
 export default class Evalutator {
@@ -8,6 +8,9 @@ export default class Evalutator {
   public eval(node = this.root) {
     if (node instanceof Literal) {
       return this.literal(node)
+    }
+    if (node instanceof Grouping) {
+      return this.grouping(node)
     }
     if (node instanceof Unary) {
       return this.unary(node)
@@ -23,6 +26,10 @@ export default class Evalutator {
     if (node.token.type === 'BOOLEAN')
       return node.token.lexeme.toLowerCase().trim() === 'true' ? true : false
     return parseFloat(node.token.lexeme)
+  }
+
+  private grouping(node: Grouping) {
+    return this.eval(node.expr)
   }
 
   private unary(node: Unary) {

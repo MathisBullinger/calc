@@ -33,6 +33,18 @@ export class Unary extends Expr {
   }
 }
 
+export class Grouping extends Expr {
+  readonly children = [this.expr]
+
+  constructor(readonly token: Token, readonly expr: Expr) {
+    super(token)
+  }
+
+  toString() {
+    return '()'
+  }
+}
+
 export class Literal extends Expr {
   constructor(readonly literal: Token) {
     super(literal)

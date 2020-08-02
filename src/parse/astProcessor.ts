@@ -1,17 +1,20 @@
 import type { Expr } from './expr'
-import { Infix, Unary } from './expr'
+import { Infix, Unary, Grouping } from './expr'
 import Token from './token'
 
 export default class AstProcessor {
   constructor(private root: Expr) {}
 
   public process(): Expr {
-    return this.walk(this.root)
+    return AstProcessor.groups(AstProcessor.chainedComp(this.root))
   }
 
-  private walk(node: Expr) {
-    if (this.isComp(node) && this.isComp((node as Infix).right)) {
-      return this.walk(
+  private static chainedComp(node: Expr): Expr {
+    if (
+      AstProcessor.isComp(node) &&
+      AstProcessor.isComp((node as Infix).right)
+    ) {
+      return AstProcessor.chainedComp(
         new Infix(
           new Infix(
             (node as Infix).left,
@@ -23,18 +26,23 @@ export default class AstProcessor {
         )
       )
     }
+    return AstProcessor.rebuild(node, AstProcessor.chainedComp)
+  }
+
+  private static groups(node: Expr) {
+    if (node instanceof Grouping) return AstProcessor.groups(node.expr)
+    return AstProcessor.rebuild(node, AstProcessor.groups)
+  }
+
+  private static rebuild(node: Expr, method: (expr: Expr) => Expr): Expr {
     if (node instanceof Infix)
-      return new Infix(
-        this.walk(node.left),
-        node.operator,
-        this.walk(node.right)
-      )
+      return new Infix(method(node.left), node.operator, method(node.right))
     if (node instanceof Unary)
-      return new Unary(node.operator, this.walk(node.right))
+      return new Unary(node.operator, method(node.right))
     return node
   }
 
-  private isComp(node: Expr) {
+  private static isComp(node: Expr) {
     return (
       node instanceof Infix && Token.comparison.includes(node.token.type as any)
     )

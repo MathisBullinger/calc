@@ -1,6 +1,6 @@
 import type Token from './token'
 import type { TokenType } from './token'
-import { Expr, Infix, Unary, Literal } from './expr'
+import { Expr, Infix, Unary, Literal, Grouping } from './expr'
 import AstProcessor from './astProcessor'
 
 export default class Parser {
@@ -103,7 +103,7 @@ export default class Parser {
       let expr = this.expression()
       if (this.check(')')) this.advance()
       else throw new Parser.error('Missing closing parenthesis', token)
-      return expr
+      return new Grouping(token, expr)
     }
   }
 
