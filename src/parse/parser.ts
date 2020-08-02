@@ -9,6 +9,7 @@ export default class Parser {
   constructor(private readonly tokens: Token[]) {}
 
   public parse(): Expr {
+    ;(window as any).tokens = this.tokens
     return new AstProcessor(this.expression()).process()
   }
 
@@ -86,7 +87,7 @@ export default class Parser {
   }
 
   private unary(): Expr {
-    if (this.match('!', '-', '+')) {
+    if (this.match('-', '+')) {
       const operator = this.previous()
       const right = this.unary()
       return new Unary(operator, right)

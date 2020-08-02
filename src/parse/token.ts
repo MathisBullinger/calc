@@ -19,7 +19,6 @@ export default class Token {
     '*',
     '/',
     '^',
-    '!',
     'and',
     'or',
     'not',
