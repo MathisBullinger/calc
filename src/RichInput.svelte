@@ -14,18 +14,27 @@
 
   let parts: Part[] = []
 
-  // function translate(i: number) {
-  //   return i
-  // }
+  function onClick(e: MouseEvent) {
+    const hit = [
+      ...(e.target as HTMLDivElement).parentNode.querySelector('.highlight')
+        .children,
+    ].find((v) => {
+      const { left, right, top, bottom } = v.getBoundingClientRect()
+      return (
+        left <= e.clientX &&
+        right >= e.clientX &&
+        top <= e.clientY &&
+        bottom >= e.clientY
+      )
+    })
+    if (hit) setTimeout(() => (hit as any).focus())
+    else if (
+      document.activeElement?.parentElement?.className?.includes('highlight')
+    )
+      (document.activeElement as any).blur()
+  }
 
   $: {
-    // formatted = value
-    // // console.log(errors)
-    // let tags = formatted.matchAll(/\<[^>]*\>/g)
-    // console.log({ formatted, tags })
-    // for (let { start, end, msg } of errors) {
-    //   console.log({ start, end, msg })
-    // }
     parts = [{ type: 'normal', content: value }]
 
     const getPos = (index: number): { offset: number; part: Part } => {
@@ -160,11 +169,12 @@
   }
 
   pre[data-ctx]:focus::after {
-    content: '';
-    display: block;
-    width: 10rem;
-    height: 10rem;
-    background: red;
+    content: attr(data-ctx);
+    border: 1px solid #fffa;
+    position: absolute;
+    top: 120%;
+    left: 50%;
+    transform: translateX(-50%);
   }
 </style>
 
@@ -175,7 +185,9 @@
     spellcheck={false}
     autocapitalize="none"
     autocomplete="off"
-    data-gramm_editor="false" />
+    data-gramm_editor="false"
+    on:mousemove={onClick}
+    on:mouseleave={onClick} />
   <textarea class="clone" readonly bind:value />
   <div class="highlight">
     {#each parts as { content, type, ctx }}
