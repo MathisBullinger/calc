@@ -45,7 +45,7 @@
 </style>
 
 <div class="input" on:click={() => $lines.slice(-1)[0].focus()}>
-  {#each $lines as { input, focus }}
-    <RichInput bind:focus bind:value={input} />
+  {#each $lines as { input, focus, errors, off }}
+    <RichInput bind:focus bind:value={input} {errors} {off} />
   {/each}
 </div>

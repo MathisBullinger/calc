@@ -11,6 +11,8 @@ export default class Line {
 
   private _input = ''
   private _output = ''
+  private _errors: InputError[] = []
+  private offset = 0
 
   public get input() {
     return this._input
@@ -22,7 +24,9 @@ export default class Line {
     if (cmd) v = v.slice(cmd.length)
 
     this._output = v
-    const { tree } = Line.eval(v.trim())
+    const { tree, errors } = Line.eval(v.trim())
+    this._errors = errors
+    this.offset = (cmd?.length ?? -1) + 1
 
     if (cmd === '/tree') treeStore.set(tree)
   }
@@ -30,12 +34,37 @@ export default class Line {
   public get output() {
     return this._output
   }
+  public get errors() {
+    return this._errors
+  }
+  public get off() {
+    return this.offset
+  }
 
-  static eval = memoize((v: string): { tree: Expr } => {
-    const tokens = new Scanner(v).scan()
+  static eval = memoize((v: string): {
+    tree: Expr
+    errors: InputError[]
+  } => {
+    let errors: InputError[] = []
+    const { tokens, errors: scannerErrors } = new Scanner(v).scan()
+    errors.push(
+      ...scannerErrors.map(({ reason, ...rest }) => ({
+        msg: reason ?? '',
+        type: 'ScannerError' as ErrorType,
+        ...rest,
+      }))
+    )
     const tree = new Parser(tokens).parse()
-    return { tree }
+    return { tree, errors }
   })
 
   public focus = () => {}
+}
+
+type ErrorType = 'ScannerError' | 'ParserError'
+type InputError = {
+  start: number
+  end: number
+  msg: string
+  type: ErrorType
 }

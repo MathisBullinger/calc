@@ -9,7 +9,7 @@ export default class Scanner {
 
   constructor(readonly source: string) {}
 
-  public scan(): Token[] {
+  public scan(): { tokens: Token[]; errors: Error[] } {
     while (this.current < this.source.length) {
       this.start = this.current
       this.scanToken()
@@ -40,7 +40,7 @@ export default class Scanner {
         }))
     )
 
-    return this.tokens
+    return { tokens: this.tokens, errors: this.errors }
   }
 
   private scanToken() {
