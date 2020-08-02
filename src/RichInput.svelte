@@ -49,9 +49,8 @@
       const start = getPos(error.start + off)
       const end = getPos(error.end + off)
       if (start.part === end.part) {
-        console.log(start)
+        const i = parts.indexOf(start.part)
         if (end.offset === start.part.content.length - 1) {
-          const i = parts.indexOf(start.part)
           const endOff = start.offset - start.part.content.length
           parts = [
             ...parts.slice(0, i),
@@ -67,18 +66,20 @@
             ...parts.slice(i + 1),
           ]
         } else if (end.offset === 0) {
-          console.warn('at start')
+          parts = [
+            ...parts.slice(0, i),
+            {
+              type: 'error',
+              content: start.part.content.slice(0, start.offset + 1),
+            },
+            {
+              type: start.part.type,
+              content: start.part.content.slice(start.offset + 1),
+            },
+            ...parts.slice(i + 1),
+          ]
         } else {
-          const i = parts.indexOf(start.part)
           const endOff = end.offset - start.part.content.length + 1
-          console.log(
-            'in middle',
-            JSON.stringify(start.part.content.slice(0, start.offset)),
-            JSON.stringify(
-              start.part.content.slice(start.offset, end.offset + 1)
-            ),
-            JSON.stringify(start.part.content.slice(endOff))
-          )
           parts = [
             ...parts.slice(0, i),
             {
@@ -195,8 +196,11 @@
   <textarea class="clone" readonly bind:value />
   <div class="highlight">
     {#each parts as { content, type, ctx }}
-      <!-- prettier-ignore -->
-      <pre {...type !== 'normal' && { class: `calc-${type}` }} {...ctx && { 'data-ctx': ctx, tabindex: 0 }}>{content}</pre>
+      {#if type === 'normal'}
+        <pre>{content}</pre>
+      {:else}
+        <pre class={`calc-${type}`} data-ctx={ctx} tabindex={0}>{content}</pre>
+      {/if}
     {/each}
   </div>
 </div>

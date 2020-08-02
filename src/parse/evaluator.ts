@@ -20,6 +20,8 @@ export default class Evalutator {
   }
 
   private literal(node: Literal) {
+    if (node.token.type === 'BOOLEAN')
+      return node.token.lexeme.toLowerCase().trim() === 'true' ? true : false
     return parseFloat(node.token.lexeme)
   }
 

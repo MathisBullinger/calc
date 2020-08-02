@@ -27,6 +27,7 @@ export default class Token {
     ...Token.grouping,
     ...Token.comparison,
     'NUMBER',
+    'BOOLEAN',
     'UNKNOWN',
   ] as const
 }

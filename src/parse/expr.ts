@@ -38,3 +38,15 @@ export class Literal extends Expr {
     super(literal)
   }
 }
+
+export class Grouping extends Expr {
+  readonly children = [this.expression]
+
+  constructor(readonly token: Token, readonly expression: Expr) {
+    super(token)
+  }
+
+  toString() {
+    return '()'
+  }
+}

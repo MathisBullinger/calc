@@ -22,15 +22,16 @@ export default class Line {
   public set input(v: string) {
     this._input = v
 
-    const cmd = v.match(/^\/\w+(?=\s)/)?.[0]
+    let cmd = v.match(/^\/\w+\s+/)?.[0]
     if (cmd) v = v.slice(cmd.length)
 
     const { tree, errors, result } = Line.eval(v.trim())
     this._errors = errors
-    this.offset = (cmd?.length ?? -1) + 1
+    this.offset = cmd?.length ?? 0
     this.offset += v.match(/^\s*/)[0].length
     this._output = result
 
+    if (cmd) cmd = cmd.trim()
     if (cmd === '/tree') treeStore.set(tree)
   }
 
@@ -58,19 +59,31 @@ export default class Line {
         ...rest,
       }))
     )
-    const tree = new Parser(tokens).parse()
+    let tree: Expr
     let result = ''
     try {
-      result = new Evaluator(tree).eval()
+      tree = new Parser(tokens).parse()
+      try {
+        result = new Evaluator(tree).eval()
+      } catch (e) {
+        if (!(e instanceof Evalutator.error)) throw e
+        errors.push({
+          start: e.token.index,
+          end: e.token.index + e.token.lexeme.length - 1,
+          msg: e.message,
+          type: 'EvaluatorError',
+        })
+      }
     } catch (e) {
-      if (!(e instanceof Evalutator.error)) throw e
+      if (!(e instanceof Parser.error)) throw e
       errors.push({
         start: e.token.index,
         end: e.token.index + e.token.lexeme.length - 1,
         msg: e.message,
-        type: 'EvaluatorError',
+        type: 'ParserError',
       })
     }
+
     return { result, tree, errors }
   })
 

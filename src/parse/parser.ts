@@ -1,6 +1,6 @@
 import type Token from './token'
 import type { TokenType } from './token'
-import { Expr, Binary, Unary, Literal } from './expr'
+import { Expr, Binary, Unary, Literal, Grouping } from './expr'
 
 export default class Parser {
   private current = 0
@@ -62,6 +62,15 @@ export default class Parser {
 
   private primary(): Expr {
     if (this.match('NUMBER')) return new Literal(this.previous())
+    if (this.match('BOOLEAN')) return new Literal(this.previous())
+
+    if (this.match('(')) {
+      const token = this.previous()
+      let expr = this.expression()
+      if (this.check(')')) this.advance()
+      else throw new Parser.error('Missing closing parenthesis', token)
+      return expr
+    }
   }
 
   private match(...types: TokenType[]) {
@@ -94,5 +103,12 @@ export default class Parser {
 
   private previous(): Token {
     return this.tokens[this.current - 1]
+  }
+
+  static error = class extends Error {
+    constructor(msg: string, readonly token: Token) {
+      super(msg)
+      this.name = 'ParserError'
+    }
   }
 }

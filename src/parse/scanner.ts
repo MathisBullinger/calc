@@ -70,6 +70,14 @@ export default class Scanner {
       }
       return this.number(base)
     }
+    if (this.reads(/true(?=[^a-z]|$)/i)) {
+      this.advance(3)
+      return this.addToken('BOOLEAN')
+    }
+    if (this.reads(/false(?=[^a-z]|$)/i)) {
+      this.advance(4)
+      return this.addToken('BOOLEAN')
+    }
     this.addToken('UNKNOWN')
   }
 
@@ -93,6 +101,10 @@ export default class Scanner {
 
   private peek(steps = 1) {
     return this.source[this.current + (steps - 1)] ?? '\u0003'
+  }
+
+  private reads(regex: RegExp) {
+    return regex.test(this.source.slice(this.current - 1))
   }
 
   private addToken(type: TokenType) {
