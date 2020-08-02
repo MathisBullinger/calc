@@ -1,6 +1,7 @@
 import type Token from './token'
 import type { TokenType } from './token'
 import { Expr, Infix, Unary, Literal } from './expr'
+import AstProcessor from './astProcessor'
 
 export default class Parser {
   private current = 0
@@ -8,7 +9,7 @@ export default class Parser {
   constructor(private readonly tokens: Token[]) {}
 
   public parse(): Expr {
-    return this.expression()
+    return new AstProcessor(this.expression()).process()
   }
 
   private expression(): Expr {

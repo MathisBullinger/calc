@@ -1,8 +1,8 @@
 export default class Token {
   public constructor(
     readonly type: TokenType,
-    readonly lexeme: string,
-    readonly index: number
+    readonly lexeme: string = type,
+    readonly index?: number
   ) {}
 
   public get category() {
