@@ -1,4 +1,4 @@
-import Token, { TokenType, Operator, Grouping } from './token'
+import Token, { TokenType, Operator, Grouping, Comparison } from './token'
 
 export default class Scanner {
   private tokens: Token[] = []
@@ -49,6 +49,13 @@ export default class Scanner {
     if (/\s/.test(c) || c === '\u0003') return
     if (Token.operators.includes(c as any)) return this.addToken(c as Operator)
     if (Token.grouping.includes(c as any)) return this.addToken(c as Grouping)
+    if (Token.comparison.includes((c + this.peek()) as any)) {
+      const comp = c + this.peek()
+      this.advance()
+      return this.addToken(comp as Comparison)
+    }
+    if (Token.comparison.includes(c as any))
+      return this.addToken(c as Comparison)
     if (/[0-9.]/.test(c)) {
       let base: 2 | 10 | 16 = 10
       if (c === '0' && '0' + this.peek()?.toLowerCase() in Token.basePrefix) {

@@ -20,13 +20,13 @@ export default class Evalutator {
   }
 
   private literal(node: Literal) {
-    return parseInt(node.token.lexeme)
+    return parseFloat(node.token.lexeme)
   }
 
   private unary(node: Unary) {
     if (!node.right)
       throw new Evalutator.error(
-        `unary ${node.operator.type} requires right hand side`,
+        `unary "${node.operator.type}" requires right hand side`,
         node.operator
       )
     let right = this.eval(node.right)
@@ -37,12 +37,12 @@ export default class Evalutator {
   private binary(node: Binary) {
     if (!node.left)
       throw new Evalutator.error(
-        `binary ${node.operator.type} requires left hand side`,
+        `binary "${node.operator.type}" requires left hand side`,
         node.operator
       )
     if (!node.right)
       throw new Evalutator.error(
-        `binary ${node.operator.type} requires right hand side`,
+        `binary "${node.operator.type}" requires right hand side`,
         node.operator
       )
 
@@ -58,6 +58,16 @@ export default class Evalutator {
         return left * right
       case '/':
         return left / right
+      case '=':
+        return left === right
+      case '<':
+        return left < right
+      case '<=':
+        return left <= right
+      case '>':
+        return left > right
+      case '>=':
+        return left >= right
     }
   }
 

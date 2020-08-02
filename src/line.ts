@@ -28,6 +28,7 @@ export default class Line {
     const { tree, errors, result } = Line.eval(v.trim())
     this._errors = errors
     this.offset = (cmd?.length ?? -1) + 1
+    this.offset += v.match(/^\s*/)[0].length
     this._output = result
 
     if (cmd === '/tree') treeStore.set(tree)
