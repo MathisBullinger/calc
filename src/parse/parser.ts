@@ -1,68 +1,98 @@
 import type Token from './token'
-import type { WithRule } from './token'
-import Group from './ast/group'
-import BinaryOp from './ast/binaryOp'
-import Number from './ast/number'
-import * as rule from './grammar'
-import type EvalNode from './ast/evalNode'
+import type { TokenType } from './token'
+import { Expr, Binary, Unary, Literal } from './expr'
 
 export default class Parser {
+  private current = 0
+
   constructor(private readonly tokens: Token[]) {}
 
-  public parse() {
-    const tokens: WithRule[] = this.tokens.map((token) => ({
-      token,
-      rule: token.category === 'NUMBER' ? new rule.Primitive() : undefined,
-    }))
-    for (let i = 1; i < tokens.length - 1; i++) {
-      if (
-        tokens[i].token.category === 'OPERATOR' &&
-        tokens[i - 1].token.category === 'NUMBER' &&
-        tokens[i + 1].token.category === 'NUMBER'
-      )
-        tokens[i].rule =
-          tokens[i].token.type === '+'
-            ? new rule.Addition()
-            : tokens[i].token.type === '-'
-            ? new rule.Substraction()
-            : tokens[i].token.type === '*'
-            ? new rule.MultiplicationExplicit()
-            : new rule.Division()
-    }
-    const ast = this.parseGroup(new Group(tokens))
-
-    let result: number
-    try {
-      result = ast.eval()
-    } catch (e) {}
-
-    return { ast, result }
+  public parse(): Expr {
+    return this.expression()
   }
 
-  private parseGroup(group: Group): InstanceType<new () => EvalNode<number>> {
-    const tokens = group.tokens
+  private expression(): Expr {
+    return this.comparison()
+  }
 
-    if (tokens.length === 1 && tokens[0].token.category === 'NUMBER')
-      return new Number(tokens[0].token)
+  private comparison(): Expr {
+    let expr = this.addition()
 
-    const ops = tokens.filter(
-      ({ token, rule }) => token.category === 'OPERATOR' && rule
-    )
-    const lowestPrec = Math.min(...ops.map(({ rule }) => rule.precedence))
-    const lowestOp = ops
-      .filter(({ rule }) => rule.precedence === lowestPrec)
-      .slice(-1)[0]
-
-    if (lowestOp) {
-      const op = new BinaryOp(lowestOp.token)
-      op.children.push(
-        this.parseGroup(new Group(tokens.slice(0, tokens.indexOf(lowestOp))))
-      )
-      op.children.push(
-        this.parseGroup(new Group(tokens.slice(tokens.indexOf(lowestOp) + 1)))
-      )
-      console.log(group, op)
-      return op
+    while (this.match('=', '!=', '<', '<=', '>', '>=')) {
+      const operator = this.previous()
+      const right = this.comparison()
+      expr = new Binary(expr, operator, right)
     }
+
+    return expr
+  }
+
+  private addition(): Expr {
+    let expr = this.multiplication()
+
+    while (this.match('+', '-')) {
+      const operator = this.previous()
+      const right = this.multiplication()
+      expr = new Binary(expr, operator, right)
+    }
+
+    return expr
+  }
+
+  private multiplication(): Expr {
+    let expr = this.unary()
+
+    while (this.match('*', '/')) {
+      const operator = this.previous()
+      const right = this.unary()
+      expr = new Binary(expr, operator, right)
+    }
+
+    return expr
+  }
+
+  private unary(): Expr {
+    if (this.match('!', '-', '+')) {
+      const operator = this.previous()
+      const right = this.unary()
+      return new Unary(operator, right)
+    }
+    return this.primary()
+  }
+
+  private primary(): Expr {
+    if (this.match('NUMBER')) return new Literal(this.previous())
+  }
+
+  private match(...types: TokenType[]) {
+    for (const type of types) {
+      if (this.check(type)) {
+        this.advance()
+        return true
+      }
+    }
+    return false
+  }
+
+  private check(type: TokenType) {
+    if (this.isAtEnd()) return false
+    return this.peek().type === type
+  }
+
+  private advance(): Token {
+    if (!this.isAtEnd()) this.current++
+    return this.previous()
+  }
+
+  private isAtEnd(): boolean {
+    return this.current >= this.tokens.length
+  }
+
+  private peek(): Token {
+    return this.tokens[this.current]
+  }
+
+  private previous(): Token {
+    return this.tokens[this.current - 1]
   }
 }

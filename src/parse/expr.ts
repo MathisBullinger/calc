@@ -1,5 +1,5 @@
-import Node from '../../utils/node'
-import type Token from '../token'
+import Node from '../utils/node'
+import type Token from './token'
 
 export class Expr extends Node {
   readonly children: Expr[] = []

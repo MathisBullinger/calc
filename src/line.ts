@@ -1,8 +1,8 @@
 import memoize from './utils/memoize'
 import Scanner from './parse/scanner'
-import Parser from './parse/parser2'
+import Parser from './parse/parser'
 import { tree as treeStore } from './stores'
-import type { Expr } from './parse/ast/Expr'
+import type { Expr } from './parse/expr'
 
 export default class Line {
   private static count = 0

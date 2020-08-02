@@ -1,5 +1,3 @@
-import type { Expression } from './grammar'
-
 export default class Token {
   public constructor(
     readonly type: TokenType,
@@ -37,8 +35,3 @@ export type Operator = typeof Token.operators[number]
 export type Comparison = typeof Token.comparison[number]
 export type Grouping = typeof Token.grouping[number]
 export type TokenType = typeof Token.type[number]
-
-export type WithRule = {
-  token: Token
-  rule?: InstanceType<new () => Expression>
-}

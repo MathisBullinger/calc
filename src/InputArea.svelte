@@ -2,7 +2,8 @@
   import { onMount } from 'svelte'
   import { lines } from './stores'
   import { atPos } from './utils/dom'
-  import RichInput from './RichInput.svelte'
+  import _RichInput from './RichInput.svelte'
+  const RichInput: any = _RichInput
 </script>
 
 <style>

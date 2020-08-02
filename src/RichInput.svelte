@@ -162,6 +162,7 @@
     font-size: inherit;
     line-height: 0;
     margin: 0;
+    position: relative;
   }
 
   pre[data-ctx]:focus {
@@ -175,6 +176,7 @@
     top: 120%;
     left: 50%;
     transform: translateX(-50%);
+    text-align: center;
   }
 </style>
 
