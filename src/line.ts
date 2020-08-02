@@ -1,8 +1,10 @@
 import memoize from './utils/memoize'
 import Scanner from './parse/scanner'
 import Parser from './parse/parser'
+import Evaluator from './parse/evaluator'
 import { tree as treeStore } from './stores'
 import type { Expr } from './parse/expr'
+import Evalutator from './parse/evaluator'
 
 export default class Line {
   private static count = 0
@@ -23,10 +25,10 @@ export default class Line {
     const cmd = v.match(/^\/\w+(?=\s)/)?.[0]
     if (cmd) v = v.slice(cmd.length)
 
-    this._output = v
-    const { tree, errors } = Line.eval(v.trim())
+    const { tree, errors, result } = Line.eval(v.trim())
     this._errors = errors
     this.offset = (cmd?.length ?? -1) + 1
+    this._output = result
 
     if (cmd === '/tree') treeStore.set(tree)
   }
@@ -42,6 +44,7 @@ export default class Line {
   }
 
   static eval = memoize((v: string): {
+    result: string
     tree: Expr
     errors: InputError[]
   } => {
@@ -55,13 +58,25 @@ export default class Line {
       }))
     )
     const tree = new Parser(tokens).parse()
-    return { tree, errors }
+    let result = ''
+    try {
+      result = new Evaluator(tree).eval()
+    } catch (e) {
+      if (!(e instanceof Evalutator.error)) throw e
+      errors.push({
+        start: e.token.index,
+        end: e.token.index + e.token.lexeme.length - 1,
+        msg: e.message,
+        type: 'EvaluatorError',
+      })
+    }
+    return { result, tree, errors }
   })
 
   public focus = () => {}
 }
 
-type ErrorType = 'ScannerError' | 'ParserError'
+type ErrorType = 'ScannerError' | 'ParserError' | 'EvaluatorError'
 type InputError = {
   start: number
   end: number
