@@ -1,5 +1,5 @@
 import type { Expr } from './expr'
-import { Literal, Unary, Binary } from './expr'
+import { Literal, Unary, Infix } from './expr'
 import type Token from './token'
 
 export default class Evalutator {
@@ -12,7 +12,7 @@ export default class Evalutator {
     if (node instanceof Unary) {
       return this.unary(node)
     }
-    if (node instanceof Binary) {
+    if (node instanceof Infix) {
       return this.binary(node)
     }
 
@@ -36,7 +36,7 @@ export default class Evalutator {
     else return -right
   }
 
-  private binary(node: Binary) {
+  private binary(node: Infix) {
     if (!node.left)
       throw new Evalutator.error(
         `binary "${node.operator.type}" requires left hand side`,
@@ -70,6 +70,10 @@ export default class Evalutator {
         return left > right
       case '>=':
         return left >= right
+      case 'or':
+        return left || right
+      case 'and':
+        return left && right
     }
   }
 

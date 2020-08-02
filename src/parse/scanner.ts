@@ -47,6 +47,11 @@ export default class Scanner {
     const c = this.advance()
 
     if (/\s/.test(c) || c === '\u0003') return
+    const isOp = this.readsWords('and', 'or')
+    if (isOp) {
+      this.advance(isOp.length)
+      return this.addToken(isOp as Operator)
+    }
     if (Token.operators.includes(c as any)) return this.addToken(c as Operator)
     if (Token.grouping.includes(c as any)) return this.addToken(c as Grouping)
     if (Token.comparison.includes((c + this.peek()) as any)) {
@@ -71,11 +76,11 @@ export default class Scanner {
       return this.number(base)
     }
     if (this.reads(/true(?=[^a-z]|$)/i)) {
-      this.advance(3)
+      this.advance(4)
       return this.addToken('BOOLEAN')
     }
     if (this.reads(/false(?=[^a-z]|$)/i)) {
-      this.advance(4)
+      this.advance(5)
       return this.addToken('BOOLEAN')
     }
     this.addToken('UNKNOWN')
@@ -105,6 +110,14 @@ export default class Scanner {
 
   private reads(regex: RegExp) {
     return regex.test(this.source.slice(this.current - 1))
+  }
+
+  private readsWords(...words: string[]) {
+    const remainder = this.source.slice(this.current - 1)
+    return words.find(
+      (word) =>
+        remainder.startsWith(word) && /[^a-zA-Z]/.test(remainder[word.length])
+    )
   }
 
   private addToken(type: TokenType) {

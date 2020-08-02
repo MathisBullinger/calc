@@ -13,7 +13,7 @@ export class Expr extends Node {
   }
 }
 
-export class Binary extends Expr {
+export class Infix extends Expr {
   readonly children = [this.left, this.right]
 
   constructor(
@@ -36,17 +36,5 @@ export class Unary extends Expr {
 export class Literal extends Expr {
   constructor(readonly literal: Token) {
     super(literal)
-  }
-}
-
-export class Grouping extends Expr {
-  readonly children = [this.expression]
-
-  constructor(readonly token: Token, readonly expression: Expr) {
-    super(token)
-  }
-
-  toString() {
-    return '()'
   }
 }

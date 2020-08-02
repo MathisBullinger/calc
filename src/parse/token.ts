@@ -13,7 +13,16 @@ export default class Token {
     return `${this.category}<${this.lexeme}>`
   }
 
-  static readonly operators = ['+', '-', '*', '/', '^', '!'] as const
+  static readonly operators = [
+    '+',
+    '-',
+    '*',
+    '/',
+    '^',
+    '!',
+    'and',
+    'or',
+  ] as const
   static readonly comparison = ['=', '!=', '<', '<=', '>', '>='] as const
   static readonly grouping = ['(', ')'] as const
 

@@ -1,6 +1,6 @@
 import type Token from './token'
 import type { TokenType } from './token'
-import { Expr, Binary, Unary, Literal, Grouping } from './expr'
+import { Expr, Infix, Unary, Literal } from './expr'
 
 export default class Parser {
   private current = 0
@@ -12,7 +12,31 @@ export default class Parser {
   }
 
   private expression(): Expr {
-    return this.comparison()
+    return this.booleanAddition()
+  }
+
+  private booleanAddition(): Expr {
+    let expr = this.booleanMultiplication()
+
+    while (this.match('or')) {
+      const operator = this.previous()
+      const right = this.booleanMultiplication()
+      expr = new Infix(expr, operator, right)
+    }
+
+    return expr
+  }
+
+  private booleanMultiplication(): Expr {
+    let expr = this.comparison()
+
+    while (this.match('and')) {
+      const operator = this.previous()
+      const right = this.comparison()
+      expr = new Infix(expr, operator, right)
+    }
+
+    return expr
   }
 
   private comparison(): Expr {
@@ -21,7 +45,7 @@ export default class Parser {
     while (this.match('=', '!=', '<', '<=', '>', '>=')) {
       const operator = this.previous()
       const right = this.comparison()
-      expr = new Binary(expr, operator, right)
+      expr = new Infix(expr, operator, right)
     }
 
     return expr
@@ -33,7 +57,7 @@ export default class Parser {
     while (this.match('+', '-')) {
       const operator = this.previous()
       const right = this.multiplication()
-      expr = new Binary(expr, operator, right)
+      expr = new Infix(expr, operator, right)
     }
 
     return expr
@@ -45,7 +69,7 @@ export default class Parser {
     while (this.match('*', '/')) {
       const operator = this.previous()
       const right = this.unary()
-      expr = new Binary(expr, operator, right)
+      expr = new Infix(expr, operator, right)
     }
 
     return expr
