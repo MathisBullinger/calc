@@ -155,7 +155,7 @@
     margin: 0;
   }
 
-  /* pre[data-ctx]:focus {
+  pre[data-ctx]:focus {
     outline: none;
   }
 
@@ -165,7 +165,7 @@
     width: 10rem;
     height: 10rem;
     background: red;
-  } */
+  }
 </style>
 
 <div class="rich-input">
@@ -179,11 +179,8 @@
   <textarea class="clone" readonly bind:value />
   <div class="highlight">
     {#each parts as { content, type, ctx }}
-      <pre
-        {...type !== 'normal' && { class: `calc-${type}` }}
-        {...ctx && { 'data-ctx': ctx, tabindex: 0 }}>
-        {content}
-      </pre>
+      <!-- prettier-ignore -->
+      <pre {...type !== 'normal' && { class: `calc-${type}` }} {...ctx && { 'data-ctx': ctx, tabindex: 0 }}>{content}</pre>
     {/each}
   </div>
 </div>
