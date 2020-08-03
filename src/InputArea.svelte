@@ -17,6 +17,8 @@
     padding-top: var(--padding);
     padding-left: var(--padding);
     cursor: text;
+    display: flex;
+    flex-direction: column;
   }
 
   .input:focus {

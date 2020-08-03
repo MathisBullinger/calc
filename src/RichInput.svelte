@@ -1,5 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { lines } from './stores'
+  import type App from './App.svelte'
+  import Line from './line'
 
   export let value = ''
   export let errors = []
@@ -102,6 +105,26 @@
     }
   }
 
+  function onKey(e: KeyboardEvent) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      lines.update((lines) => [...lines, new Line()])
+      setTimeout(() => $lines.slice(-1)[0].focus())
+    }
+  }
+
+  function onInput({
+    target,
+  }: Event & { target: EventTarget & HTMLTextAreaElement }) {
+    const clone: HTMLTextAreaElement = (target as HTMLTextAreaElement).parentElement.querySelector(
+      '.clone'
+    )
+    if (!clone) return
+    requestAnimationFrame(() => {
+      const lines = (clone.scrollHeight / 21) | 0
+    })
+  }
+
   let textarea: HTMLElement
 </script>
 
@@ -109,6 +132,8 @@
   .rich-input {
     position: relative;
     width: 100%;
+    height: 1.5rem;
+    margin-bottom: 1.5rem;
   }
 
   .rich-input * {
@@ -141,9 +166,9 @@
     pointer-events: none;
     user-select: none;
     max-width: 100%;
-    overflow-wrap: break-word;
     display: flex;
     align-items: baseline;
+    overflow-x: hidden;
   }
 
   .clone {
@@ -161,8 +186,10 @@
     display: inline;
     font-family: inherit;
     font-size: inherit;
-    line-height: 0;
     margin: 0;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
   }
 
   pre[data-ctx]:focus {
@@ -183,7 +210,7 @@
   }
 </style>
 
-<div class="rich-input">
+<div class="rich-input" on:click={(e) => e.stopPropagation()}>
   <textarea
     bind:value
     bind:this={textarea}
@@ -192,7 +219,9 @@
     autocomplete="off"
     data-gramm_editor="false"
     on:mousemove={onClick}
-    on:mouseleave={onClick} />
+    on:mouseleave={onClick}
+    on:keydown={onKey}
+    on:input={onInput} />
   <textarea class="clone" readonly bind:value />
   <div class="highlight">
     {#each parts as { content, type, ctx }}
