@@ -75,11 +75,11 @@ export default class Scanner {
       }
       return this.number(base)
     }
-    if (this.reads(/true(?=[^a-z]|$)/i)) {
+    if (this.reads(/^true(?=[^a-z]|$)/i)) {
       this.advance(3)
       return this.addToken('BOOLEAN')
     }
-    if (this.reads(/false(?=[^a-z]|$)/i)) {
+    if (this.reads(/^false(?=[^a-z]|$)/i)) {
       this.advance(4)
       return this.addToken('BOOLEAN')
     }
